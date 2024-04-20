@@ -43,6 +43,11 @@
 				{
 					"command": "rename-tabs.tabLabels.rename"
 				}
+            ],
+            "explorer/context": [
+                {
+                    "command": "rename-tabs.tabLabels.rename"
+                }
             ]
         }
     },

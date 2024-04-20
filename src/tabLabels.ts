@@ -25,21 +25,36 @@ export class TabLabels {
         const configuration = workspace.getConfiguration();
         configuration.update('workbench.editor.customLabels.enabled', true, ConfigurationTarget.Workspace);
 
-
         const relativePath = this.getRelativePath(uri);
         const fileName = this.getFileName(uri);
-        const newName = await vscode.window.showInputBox({
-            placeHolder: fileName,
-            prompt: `What would you like to rename '${fileName}'?`,
-            ignoreFocusOut: false,
-            value: fileName,
-            valueSelection: [0, fileName.length]
-        });
-        if (!newName) return;
         
+        // Attempt to read this path from the old custom labels in the workspace settings to see if the user has ever
+        //      renamed this tab before
+        // If this tab has been renamed before, use the old label in the prompt, otherwise use the file name
         const oldPatterns: { [index: string]: string} = await configuration.get('workbench.editor.customLabels.patterns') || {};
-        const finalPatterns = { ...oldPatterns };
-        finalPatterns[relativePath] = newName;
+        const oldName = relativePath in oldPatterns 
+            ? oldPatterns[relativePath]
+            : fileName;
+
+        // Get label for this tab
+        const newName = await vscode.window.showInputBox({
+            placeHolder: oldName,
+            prompt: `What would you like to rename '${oldName}'?`,
+            ignoreFocusOut: false,
+            value: oldName,
+            valueSelection: [0, oldName.length]
+        });
+        if (newName === undefined || newName === null) return;
+        
+        // If the label was empty, remove the label
+        const finalPatterns = { ...oldPatterns };   
+        if (newName === '') {
+            delete finalPatterns[relativePath];
+        }
+        else {
+            finalPatterns[relativePath] = newName;
+        }
+        
 
         return configuration.update('workbench.editor.customLabels.patterns', finalPatterns, ConfigurationTarget.Workspace);
     }
@@ -47,6 +62,7 @@ export class TabLabels {
     async removeExtensionsForOpenTabs () {
         const configuration = workspace.getConfiguration();
         configuration.update('workbench.editor.customLabels.enabled', true, ConfigurationTarget.Workspace);
+        const oldPatterns: { [index: string]: string} = await configuration.get('workbench.editor.customLabels.patterns') || {};
     
         const newPatterns: { [index: string]: string } = {};
         for (const group of vscode.window.tabGroups.all) {
@@ -57,14 +73,24 @@ export class TabLabels {
                 const relativePath = this.getRelativePath(uri);
                 const fileName = this.getFileName(uri);
                 const fileNameSegments = fileName.split('.');
-                const fileNameNoExt = fileNameSegments[0];
-    
+
+                let finalName: string;
+                if (fileNameSegments.length === 1) {
+                    finalName = fileNameSegments[0];
+                }
+                else {
+                    const allButLast = fileNameSegments.slice(0, fileNameSegments.length-1);
+                    finalName = allButLast.join('.');
+                }
+
+                // Don't rename for those files who have already been renamed
+                if (relativePath in oldPatterns) continue;
+
                 // If the node was found in the recycling bin, mark it as deleted in the label so the user knows
-                newPatterns[relativePath] = fileNameNoExt;
+                newPatterns[relativePath] = finalName;
             }
         }
     
-        const oldPatterns: { [index: string]: string} = await configuration.get('workbench.editor.customLabels.patterns') || {};
         const combinedPatterns = { ...oldPatterns, ...newPatterns };
         return configuration.update('workbench.editor.customLabels.patterns', combinedPatterns, ConfigurationTarget.Workspace);
     }
