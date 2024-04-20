@@ -6,6 +6,10 @@
     "engines": {
         "vscode": "^1.88.0"
     },
+    "repository": {
+        "url": "https://github.com/Luke-Callaghan23/VSCode-Tab-Labels",
+        "type": "git"
+    },
     "categories": [
         "Other"
     ],
