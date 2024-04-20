@@ -1,7 +1,5 @@
 # Rename Tabs README
 
-This is the README for your extension "rename-tabs". After writing up a brief description, we recommend including the following sections.
-
 ## Features
 
 Adds the ability to rename the display text of a given tab in the context menu of that tab.  Right click the tab and hit 'Rename Tab'.
