@@ -3,6 +3,9 @@
     "displayName": "Rename Tabs",
     "description": "Adds the ability to assign names to tabs by right clicking on them in the tab bar",
     "version": "0.0.1",
+    "publisher": "luke-callaghan",
+    "private": "false",
+    "license": "MIT",
     "engines": {
         "vscode": "^1.88.0"
     },
