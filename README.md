@@ -13,3 +13,9 @@ NOTE: These labels will stay persistent when you close VS Code and across comput
 ### 0.0.1
 
 Initial release of Rename Tabs
+
+### 0.0.2
+
+Fixed relative pathing (new vscode updates requires '*/' to be inserted in front of relative paths).
+
+Added 'Rename Active Document' command.

@@ -2,10 +2,11 @@
     "name": "rename-tabs",
     "displayName": "Rename Tabs",
     "description": "Adds the ability to assign names to tabs by right clicking on them in the tab bar",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "luke-callaghan",
     "private": "false",
     "license": "MIT",
+    "icon": "media/tags.png",
     "engines": {
         "vscode": "^1.88.0"
     },
@@ -19,6 +20,10 @@
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
+			{
+				"command": "rename-tabs.tabLabels.renameActiveTab",
+				"title": "Rename Tabs: Rename Active Tab"
+			},
 			{
 				"command": "rename-tabs.tabLabels.rename",
 				"title": "Rename Tab"
@@ -49,7 +54,13 @@
                     "command": "rename-tabs.tabLabels.rename"
                 }
             ]
-        }
+        },
+        "keybindings": [
+            {
+                "command": "rename-tabs.tabLabels.renameActiveTab",
+                "key": "shift+f2"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

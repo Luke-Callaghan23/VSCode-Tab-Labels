@@ -12,7 +12,7 @@ export class TabLabels {
         if (relativePath.startsWith('/')) {
             relativePath = relativePath.substring(1);
         }
-        return relativePath;
+        return "*/" + relativePath;
     }
 
     private getFileName (uri: vscode.Uri): string {
