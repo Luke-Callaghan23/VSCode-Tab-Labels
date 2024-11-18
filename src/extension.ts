@@ -2,9 +2,10 @@ import * as vscode from 'vscode';
 import { TabLabels } from './tabLabels';
 
 export let rootPath: vscode.Uri;
+export let isWorkspace: boolean;
 
 export function activate(context: vscode.ExtensionContext) {
-	const tabLabels = new TabLabels();
+	const tabLabels = new TabLabels(context);
 	context.subscriptions.push(vscode.commands.registerCommand("rename-tabs.tabLabels.renameActiveTab", () => {
 		const active = vscode.window.activeTextEditor;
 		const activeDocument = active?.document?.uri;
@@ -25,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
 		return tabLabels.removeExtensionsForOpenTabs();
 	}));
 
-
+	isWorkspace = !!(vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0));
 	rootPath = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
 		? vscode.workspace.workspaceFolders[0].uri : vscode.Uri.parse('.');
 }

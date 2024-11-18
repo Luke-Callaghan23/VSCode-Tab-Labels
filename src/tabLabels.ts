@@ -2,9 +2,13 @@
 import * as vscode from 'vscode';
 import { ConfigurationTarget, workspace } from 'vscode';
 import * as extension from './extension';
+import * as nodePath from 'path';
+const posixPath = nodePath.posix || nodePath;
 
 export class TabLabels {
-    constructor () {}
+    constructor (
+        private context: vscode.ExtensionContext
+    ) {}
 
     private getRelativePath (uri: vscode.Uri): string {
         // Remove the extension root path from the pattern
@@ -16,24 +20,33 @@ export class TabLabels {
     }
 
     private getFileName (uri: vscode.Uri): string {
-        const segments = uri.path.split('/');
-        const fileName = segments[segments.length - 1];
-        return fileName;
+        return posixPath.basename(uri.path);
     }
 
     async renameTab (uri: vscode.Uri) {
         const configuration = workspace.getConfiguration();
-        configuration.update('workbench.editor.customLabels.enabled', true, ConfigurationTarget.Workspace);
 
-        const relativePath = this.getRelativePath(uri);
+        let targetPath: string;
+        if (extension.isWorkspace) {
+            configuration.update('workbench.editor.customLabels.enabled', true, ConfigurationTarget.Workspace);
+
+            const relativePath = this.getRelativePath(uri);
+            targetPath = relativePath;
+        }
+        else {
+            configuration.update('workbench.editor.customLabels.enabled', true, ConfigurationTarget.Global);
+
+            targetPath = uri.fsPath.replaceAll('\\', '/');;
+        }
+
         const fileName = this.getFileName(uri);
         
         // Attempt to read this path from the old custom labels in the workspace settings to see if the user has ever
         //      renamed this tab before
         // If this tab has been renamed before, use the old label in the prompt, otherwise use the file name
         const oldPatterns: { [index: string]: string} = await configuration.get('workbench.editor.customLabels.patterns') || {};
-        const oldName = relativePath in oldPatterns 
-            ? oldPatterns[relativePath]
+        const oldName = targetPath in oldPatterns 
+            ? oldPatterns[targetPath]
             : fileName;
 
         // Get label for this tab
@@ -49,14 +62,22 @@ export class TabLabels {
         // If the label was empty, remove the label
         const finalPatterns = { ...oldPatterns };   
         if (newName === '') {
-            delete finalPatterns[relativePath];
+            delete finalPatterns[targetPath];
         }
         else {
-            finalPatterns[relativePath] = newName;
+            finalPatterns[targetPath] = newName;
         }
         
-
-        return configuration.update('workbench.editor.customLabels.patterns', finalPatterns, ConfigurationTarget.Workspace);
+        if (extension.isWorkspace) {
+            return configuration.update('workbench.editor.customLabels.patterns', finalPatterns, ConfigurationTarget.Workspace);
+        }
+        else {
+            if (!this.context.globalState.get('rename-tabs.showedGlobalWarning')) {
+                vscode.window.showWarningMessage("You're working outside of a VS Code Workspace, so the tab name configuration was saved to global VS Code settings instead.");
+                this.context.globalState.update('rename-tabs.showedGlobalWarning', true);
+            }
+            return configuration.update('workbench.editor.customLabels.patterns', finalPatterns, ConfigurationTarget.Global);
+        }
     }
 
     async removeExtensionsForOpenTabs () {
