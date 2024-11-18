@@ -19,3 +19,7 @@ Initial release of Rename Tabs
 Fixed relative pathing (new vscode updates requires '*/' to be inserted in front of relative paths).
 
 Added 'Rename Active Document' command.
+
+### 0.0.3
+
+Added support for renaming 

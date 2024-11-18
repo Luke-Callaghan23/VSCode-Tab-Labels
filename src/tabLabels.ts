@@ -19,6 +19,15 @@ export class TabLabels {
         return "*/" + relativePath;
     }
 
+    checkIsChildDirectory (parentUri: vscode.Uri, childUri: vscode.Uri) {
+        const parentPath = parentUri.fsPath;
+        const childPath = childUri.fsPath;
+        const relative = nodePath.relative(parentPath, childPath);
+        
+        return relative && !relative.startsWith('..') && !nodePath.isAbsolute(relative);
+    }
+
+
     private getFileName (uri: vscode.Uri): string {
         return posixPath.basename(uri.path);
     }
@@ -26,8 +35,10 @@ export class TabLabels {
     async renameTab (uri: vscode.Uri) {
         const configuration = workspace.getConfiguration();
 
+        const updateTargetIsWorkspace = extension.isWorkspace && this.checkIsChildDirectory(extension.rootPath, uri);
+
         let targetPath: string;
-        if (extension.isWorkspace) {
+        if (updateTargetIsWorkspace) {
             configuration.update('workbench.editor.customLabels.enabled', true, ConfigurationTarget.Workspace);
 
             const relativePath = this.getRelativePath(uri);
@@ -76,12 +87,12 @@ export class TabLabels {
             finalPatterns[targetPath] = newName;
         }
         
-        if (extension.isWorkspace) {
+        if (updateTargetIsWorkspace) {
             return configuration.update('workbench.editor.customLabels.patterns', finalPatterns, ConfigurationTarget.Workspace);
         }
         else {
             if (!this.context.globalState.get('rename-tabs.showedGlobalWarning')) {
-                vscode.window.showWarningMessage("You're working outside of a VS Code Workspace, so the tab name configuration was saved to global VS Code settings instead.");
+                vscode.window.showWarningMessage("[WARN] Renamed a file outside of a VS Code Workspace.  Could not update local Workspace settings, so Global VS Code settings were updated instead.");
                 this.context.globalState.update('rename-tabs.showedGlobalWarning', true);
             }
             return configuration.update('workbench.editor.customLabels.patterns', finalPatterns, ConfigurationTarget.Global);
