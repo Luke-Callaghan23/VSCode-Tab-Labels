@@ -36,7 +36,15 @@ export class TabLabels {
         else {
             configuration.update('workbench.editor.customLabels.enabled', true, ConfigurationTarget.Global);
 
-            targetPath = uri.fsPath.replaceAll('\\', '/');;
+            // While not in a workspace, we use the absolute path of the file
+            targetPath = uri.fsPath.replaceAll('\\', '/');
+
+            // For windows, absolute paths start with a drive letter, e.g. C:, E:, D:
+            //      but the patterns configuration expects absolute paths to start 
+            //      with a '/'
+            if (!targetPath.startsWith("/")) {
+                targetPath = "/" + targetPath;
+            }
         }
 
         const fileName = this.getFileName(uri);
