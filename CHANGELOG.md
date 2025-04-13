@@ -11,3 +11,7 @@
 - Added Rename Active Tab command
 
 - Added icon
+
+## [0.0.4]
+
+- Added an error message for when a user tries to rename a webview, or any other uri with a scheme that is not 'file'

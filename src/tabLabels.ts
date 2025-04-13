@@ -23,7 +23,6 @@ export class TabLabels {
         const parentPath = parentUri.fsPath;
         const childPath = childUri.fsPath;
         const relative = nodePath.relative(parentPath, childPath);
-        
         return relative && !relative.startsWith('..') && !nodePath.isAbsolute(relative);
     }
 
@@ -34,6 +33,10 @@ export class TabLabels {
 
     async renameTab (uri: vscode.Uri) {
         const configuration = workspace.getConfiguration();
+
+        if (uri.scheme !== 'file') {
+            return extension.emitErrorUnableToRename();
+        }
 
         const updateTargetIsWorkspace = extension.isWorkspace && this.checkIsChildDirectory(extension.rootPath, uri);
 
