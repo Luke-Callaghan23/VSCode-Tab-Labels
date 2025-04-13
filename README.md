@@ -23,3 +23,7 @@ Added 'Rename Active Document' command.
 ### 0.0.3
 
 Added support for renaming files outside of a VS Code Workspace after issue #3 was brought up.  rename-tabs was not originally intended for use in workspaces only, but I decided to allow absolute paths in the global VS Code settings as it seems it will help some users.
+
+### 0.0.4
+
+In response to #4 and #5, now an error will be emitted when a user tries to rename a tab that is a webview or not on the file system.
