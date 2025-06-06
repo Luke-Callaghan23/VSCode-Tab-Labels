@@ -2,7 +2,7 @@
     "name": "rename-tabs",
     "displayName": "Rename Tabs",
     "description": "Adds the ability to assign names to tabs by right clicking on them in the tab bar",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "publisher": "luke-callaghan",
     "private": "false",
     "license": "MIT",

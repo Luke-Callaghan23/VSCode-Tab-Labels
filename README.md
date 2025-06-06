@@ -27,3 +27,7 @@ Added support for renaming files outside of a VS Code Workspace after issue #3 w
 ### 0.0.4
 
 In response to #4 and #5, now an error will be emitted when a user tries to rename a tab that is a webview or not on the file system.
+
+### 0.0.5
+
+Added additional error message for Untitled documents -- related to issue #6.

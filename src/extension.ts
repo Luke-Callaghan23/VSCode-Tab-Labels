@@ -4,8 +4,13 @@ import { TabLabels } from './tabLabels';
 export let rootPath: vscode.Uri;
 export let isWorkspace: boolean;
 
-export function emitErrorUnableToRename () {
-	vscode.window.showErrorMessage('[ERR] Cannot rename tabs created by other extensions!  Vscode-Tab-Labels only works on files from your file system.  If you would like to rename this tab, I recommend opening a ticket with the extension authors that created it.');
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export function emitErrorUnableToRename__untitled () {
+	vscode.window.showErrorMessage("[ERR] Cannot rename Unitled tabs!  Vscode-Tab-Labels only works on files with a set location on your file system, but 'Untitled' files are virtual files created by VSCode.  If you would like to rename this file, please first save it as an actual document then try again.");
+}
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export function emitErrorUnableToRename__generic () {
+	vscode.window.showErrorMessage('[ERR] Cannot rename tabs created by other extensions!  Vscode-Tab-Labels only works on files with a set location from your file system, but you tried to rename a webview.  If you would like to rename this tab, I recommend opening a ticket with the extension authors that created it.');
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -32,7 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if (activeTab.input instanceof vscode.TabInputText || activeTab.input instanceof vscode.TabInputNotebook) {
 			return tabLabels.renameTab(activeTab.input.uri);
 		}
-		return emitErrorUnableToRename();
+		return emitErrorUnableToRename__generic();
 	}));
 	context.subscriptions.push(vscode.commands.registerCommand("rename-tabs.tabLabels.rename", (uri: vscode.Uri) => {
 		return tabLabels.renameTab(uri);

@@ -15,3 +15,7 @@
 ## [0.0.4]
 
 - Added an error message for when a user tries to rename a webview, or any other uri with a scheme that is not 'file'
+
+## [0.0.5]
+
+- Added a special error message for 'Untitled' files as the previous generic error message could be confusing

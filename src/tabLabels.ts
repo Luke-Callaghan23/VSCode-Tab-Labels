@@ -34,8 +34,11 @@ export class TabLabels {
     async renameTab (uri: vscode.Uri) {
         const configuration = workspace.getConfiguration();
 
+        if (uri.scheme === 'untitled') {
+            return extension.emitErrorUnableToRename__untitled();
+        }
         if (uri.scheme !== 'file') {
-            return extension.emitErrorUnableToRename();
+            return extension.emitErrorUnableToRename__generic();
         }
 
         const updateTargetIsWorkspace = extension.isWorkspace && this.checkIsChildDirectory(extension.rootPath, uri);
